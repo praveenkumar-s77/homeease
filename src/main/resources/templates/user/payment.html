@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - HomeEase</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">🏠 HomeEase</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4"><i class="bi bi-credit-card"></i> Payment</h4>
+
+                        <!-- Booking Summary -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6>Booking Summary</h6>
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr>
+                                        <td class="text-muted">Service</td>
+                                        <td th:text="${booking.category.name}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Date</td>
+                                        <td th:text="${booking.bookingDate}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Time</td>
+                                        <td th:text="${booking.bookingTime}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Address</td>
+                                        <td th:text="${booking.address}"></td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td class="fw-bold">Amount</td>
+                                        <td class="fw-bold text-success" th:text="'₹' + ${booking.amount}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payment Options -->
+                        <div th:if="${booking.paymentStatus.name() == 'UNPAID'}">
+                            <h6>Choose Payment Method</h6>
+
+                            <!-- Razorpay Online Payment -->
+                            <button id="payOnlineBtn" class="btn btn-primary w-100 mb-2" onclick="payWithRazorpay()">
+                                <i class="bi bi-credit-card-2-front"></i> Pay Online (Razorpay)
+                            </button>
+
+                            <!-- Cash on Service -->
+                            <form th:action="@{/payment/{id}/cash(id=${booking.id})}" method="post">
+                                <button type="submit" class="btn btn-outline-secondary w-100 mb-2">
+                                    <i class="bi bi-cash"></i> Pay Cash on Service
+                                </button>
+                            </form>
+
+                            <a href="/dashboard" class="btn btn-link w-100 text-muted">Pay Later</a>
+                        </div>
+
+                        <!-- Already Paid -->
+                        <div th:if="${booking.paymentStatus.name() == 'PAID'}">
+                            <div class="alert alert-success text-center">
+                                <i class="bi bi-check-circle-fill"></i> Payment Successful
+                                <div class="small" th:if="${booking.paymentId != null}"
+                                     th:text="'Payment ID: ' + ${booking.paymentId}"></div>
+                            </div>
+                            <a href="/dashboard" class="btn btn-primary w-100">Go to Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script th:inline="javascript">
+        const bookingId = [[${booking.id}]];
+        const bookingAmount = [[${booking.amount}]];
+
+        function payWithRazorpay() {
+            // Create order on server
+            fetch(`/api/payment/create-order/${bookingId}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+
+                    const options = {
+                        key: data.key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: 'HomeEase',
+                        description: 'Service Booking Payment',
+                        order_id: data.orderId,
+                        handler: function(response) {
+                            // Verify payment on server
+                            const params = new URLSearchParams();
+                            params.append('razorpayPaymentId', response.razorpay_payment_id);
+                            params.append('razorpayOrderId', response.razorpay_order_id);
+
+                            fetch(`/api/payment/verify/${bookingId}`, {
+                                method: 'POST',
+                                body: params
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if (result.status === 'success') {
+                                    window.location.reload();
+                                }
+                            });
+                        },
+                        theme: { color: '#667eea' }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                })
+                .catch(err => alert('Payment failed. Please try again.'));
+        }
+    </script>
+</body>
+</html>

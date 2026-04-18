@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Book Service - HomeEase</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .worker-card { border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .worker-card:hover { border-color: #0d6efd; background: #f0f7ff; }
+        .worker-card.selected { border-color: #0d6efd; background: #e7f1ff; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .step-indicator .step-dot { width: 32px; height: 32px; border-radius: 50%; display: inline-flex;
+            align-items: center; justify-content: center; font-weight: bold; }
+        .step-dot.done { background: #198754; color: white; }
+        .step-dot.current { background: #0d6efd; color: white; }
+        .step-dot.pending { background: #dee2e6; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">🏠 HomeEase</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Step Indicator -->
+        <div class="step-indicator text-center mb-4">
+            <span class="step-dot current" id="dot1">1</span>
+            <span class="text-muted mx-2">———</span>
+            <span class="step-dot pending" id="dot2">2</span>
+            <span class="text-muted mx-2">———</span>
+            <span class="step-dot pending" id="dot3">3</span>
+            <div class="mt-1">
+                <small class="text-muted" id="stepLabel">Step 1: Fill Details</small>
+            </div>
+        </div>
+
+        <!-- STEP 1: Booking Details -->
+        <div class="step active" id="step1">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3">Book <span th:text="${category.name}">Service</span></h4>
+                            <p class="text-muted" th:text="${category.description}">Description</p>
+
+                            <div class="alert alert-info location-status" id="locationStatus">
+                                <i class="bi bi-geo-alt"></i> Detecting your location...
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Your Address</label>
+                                <textarea id="address" class="form-control" rows="2" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label for="bookingDate" class="form-label">Preferred Date</label>
+                                    <input type="date" id="bookingDate" class="form-control" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="bookingTime" class="form-label">Preferred Time</label>
+                                    <input type="time" id="bookingTime" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Problem Description (optional)</label>
+                                <textarea id="description" class="form-control" rows="2"></textarea>
+                            </div>
+                            <button class="btn btn-primary w-100" onclick="goToStep2()">
+                                Proceed → Choose Worker
+                            </button>
+                            <a href="/dashboard" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Select Worker -->
+        <div class="step" id="step2">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="bi bi-people"></i> Available Workers Near You</h5>
+                                <select id="radiusSelect" class="form-select form-select-sm w-auto" onchange="fetchNearbyWorkers()">
+                                    <option value="5">5 km</option>
+                                    <option value="10" selected>10 km</option>
+                                    <option value="20">20 km</option>
+                                    <option value="50">50 km</option>
+                                </select>
+                            </div>
+
+                            <div id="workersLoading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-2 text-muted">Finding workers near you...</p>
+                            </div>
+                            <div id="workersList"></div>
+                            <div id="noWorkers" class="alert alert-warning d-none">
+                                <i class="bi bi-exclamation-triangle"></i> No workers found nearby. Try increasing the radius or proceed without selecting.
+                            </div>
+
+                            <div class="mt-3">
+                                <button class="btn btn-outline-secondary me-2" onclick="goToStep(1)">← Back</button>
+                                <button class="btn btn-primary" id="proceedBtn" onclick="goToStep3()">
+                                    Proceed → Confirm Booking
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Worker Profile Panel -->
+                <div class="col-md-4">
+                    <div class="card shadow" id="workerProfileCard" style="display:none;">
+                        <div class="card-body p-4">
+                            <h5><i class="bi bi-person-badge"></i> Worker Profile</h5>
+                            <hr>
+                            <div id="workerProfileContent"></div>
+                        </div>
+                    </div>
+                    <div class="card bg-light" id="profilePlaceholder">
+                        <div class="card-body text-center text-muted p-4">
+                            <i class="bi bi-person-circle" style="font-size:3rem;"></i>
+                            <p class="mt-2">Click on a worker to view their profile</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Confirm Booking -->
+        <div class="step" id="step3">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3"><i class="bi bi-check-circle"></i> Confirm Booking</h4>
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr><td class="text-muted">Service</td><td th:text="${category.name}"></td></tr>
+                                        <tr><td class="text-muted">Date</td><td id="confirmDate"></td></tr>
+                                        <tr><td class="text-muted">Time</td><td id="confirmTime"></td></tr>
+                                        <tr><td class="text-muted">Address</td><td id="confirmAddress"></td></tr>
+                                        <tr><td class="text-muted">Worker</td><td id="confirmWorker">Auto-assign</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <form th:action="@{/book/{id}(id=${category.id})}" method="post" id="bookingForm">
+                                <input type="hidden" name="address" id="formAddress">
+                                <input type="hidden" name="bookingDate" id="formDate">
+                                <input type="hidden" name="bookingTime" id="formTime">
+                                <input type="hidden" name="description" id="formDesc">
+                                <input type="hidden" name="latitude" id="formLat">
+                                <input type="hidden" name="longitude" id="formLng">
+                                <input type="hidden" name="selectedWorkerId" id="formWorkerId" value="">
+
+                                <button class="btn btn-outline-secondary me-2" type="button" onclick="goToStep(2)">← Back</button>
+                                <button type="submit" class="btn btn-success">Confirm Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const categoryId = [[${category.id}]];
+        let userLat = null, userLng = null;
+        let selectedWorkerId = null;
+        let selectedWorkerName = null;
+
+        // Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    userLat = pos.coords.latitude;
+                    userLng = pos.coords.longitude;
+                    document.getElementById('locationStatus').innerHTML =
+                        '<i class="bi bi-geo-alt-fill text-success"></i> Location detected (' +
+                        userLat.toFixed(4) + ', ' + userLng.toFixed(4) + ')';
+                    document.getElementById('locationStatus').className = 'alert alert-success';
+                },
+                function() {
+                    document.getElementById('locationStatus').innerHTML =
+                        '<i class="bi bi-geo-alt"></i> Location not available. Workers will be assigned by admin.';
+                    document.getElementById('locationStatus').className = 'alert alert-warning';
+                }
+            );
+        }
+
+        function goToStep(n) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + n).classList.add('active');
+            const labels = ['Step 1: Fill Details', 'Step 2: Choose Worker', 'Step 3: Confirm Booking'];
+            document.getElementById('stepLabel').textContent = labels[n - 1];
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('dot' + i);
+                dot.className = 'step-dot ' + (i < n ? 'done' : (i === n ? 'current' : 'pending'));
+            }
+        }
+
+        function goToStep2() {
+            const addr = document.getElementById('address').value.trim();
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            if (!addr || !date || !time) { alert('Please fill in address, date and time.'); return; }
+            goToStep(2);
+            fetchNearbyWorkers();
+        }
+
+        function goToStep3() {
+            document.getElementById('confirmDate').textContent = document.getElementById('bookingDate').value;
+            document.getElementById('confirmTime').textContent = document.getElementById('bookingTime').value;
+            document.getElementById('confirmAddress').textContent = document.getElementById('address').value;
+            document.getElementById('confirmWorker').textContent = selectedWorkerName || 'Auto-assign by admin';
+
+            document.getElementById('formAddress').value = document.getElementById('address').value;
+            document.getElementById('formDate').value = document.getElementById('bookingDate').value;
+            document.getElementById('formTime').value = document.getElementById('bookingTime').value;
+            document.getElementById('formDesc').value = document.getElementById('description').value;
+            document.getElementById('formLat').value = userLat || 0;
+            document.getElementById('formLng').value = userLng || 0;
+            document.getElementById('formWorkerId').value = selectedWorkerId || '';
+            goToStep(3);
+        }
+
+        function fetchNearbyWorkers() {
+            if (!userLat || !userLng) {
+                document.getElementById('workersLoading').classList.add('d-none');
+                document.getElementById('noWorkers').classList.remove('d-none');
+                document.getElementById('noWorkers').innerHTML =
+                    '<i class="bi bi-info-circle"></i> Location not detected. A worker will be assigned by admin after booking.';
+                return;
+            }
+            const radius = document.getElementById('radiusSelect').value;
+            document.getElementById('workersLoading').classList.remove('d-none');
+            document.getElementById('workersList').innerHTML = '';
+            document.getElementById('noWorkers').classList.add('d-none');
+
+            fetch(`/api/location/nearby-workers?lat=${userLat}&lng=${userLng}&categoryId=${categoryId}&radius=${radius}`)
+                .then(r => r.json())
+                .then(workers => {
+                    document.getElementById('workersLoading').classList.add('d-none');
+                    const list = document.getElementById('workersList');
+                    if (workers.length === 0) {
+                        document.getElementById('noWorkers').classList.remove('d-none');
+                        return;
+                    }
+                    workers.forEach(w => {
+                        const card = document.createElement('div');
+                        card.className = 'card worker-card mb-2 p-3' + (selectedWorkerId == w.id ? ' selected' : '');
+                        card.onclick = function() { selectWorker(w.id, w.name, card); };
+                        card.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${w.name}</strong>
+                                    ${w.verified ? '<i class="bi bi-patch-check-fill text-primary ms-1" title="Verified"></i>' : ''}
+                                    <div class="text-muted small">${w.category} · ${w.completedBookings} jobs done</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success">${w.distanceKm} km</span>
+                                    <div class="small">⭐ ${w.rating} · ₹${w.hourlyRate}/hr</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); viewProfile(${w.id})">
+                                    <i class="bi bi-person-lines-fill"></i> View Profile
+                                </button>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    });
+                });
+        }
+
+        function selectWorker(id, name, card) {
+            document.querySelectorAll('.worker-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedWorkerId = id;
+            selectedWorkerName = name;
+        }
+
+        function viewProfile(workerId) {
+            document.getElementById('workerProfileCard').style.display = 'block';
+            document.getElementById('profilePlaceholder').style.display = 'none';
+            document.getElementById('workerProfileContent').innerHTML =
+                '<div class="text-center"><div class="spinner-border spinner-border-sm"></div></div>';
+
+            fetch(`/api/location/worker-profile/${workerId}`)
+                .then(r => r.json())
+                .then(p => {
+                    document.getElementById('workerProfileContent').innerHTML = `
+                        <div class="text-center mb-3">
+                            <i class="bi bi-person-circle" style="font-size:3rem;color:#0d6efd;"></i>
+                            <h5 class="mt-2">${p.name}
+                                ${p.verified ? '<i class="bi bi-patch-check-fill text-primary"></i>' : '<span class="badge bg-secondary">Unverified</span>'}
+                            </h5>
+                            <span class="badge bg-primary">${p.category}</span>
+                        </div>
+                        <table class="table table-sm">
+                            <tr><td class="text-muted">Rating</td><td>⭐ ${p.rating} / 5</td></tr>
+                            <tr><td class="text-muted">Hourly Rate</td><td>₹${p.hourlyRate}</td></tr>
+                            <tr><td class="text-muted">Completed Jobs</td><td>${p.completedBookings}</td></tr>
+                            <tr><td class="text-muted">Total Bookings</td><td>${p.totalBookings}</td></tr>
+                            <tr><td class="text-muted">Area</td><td>${p.address || 'N/A'}</td></tr>
+                            <tr><td class="text-muted">Available</td>
+                                <td>${p.available ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>'}</td></tr>
+                            <tr><td class="text-muted">Phone</td>
+                                <td id="profilePhone_${p.id}">
+                                    <span class="text-muted">XXXXX-XXXX</span>
+                                    <a class="ms-1" style="cursor:pointer;color:#0d6efd;" onclick="revealWorkerPhone(${p.id})">
+                                        <i class="bi bi-eye"></i> Tap to reveal
+                                    </a>
+                                </td></tr>
+                        </table>
+                        <button class="btn btn-primary btn-sm w-100" onclick="selectWorkerFromProfile(${p.id}, '${p.name}')">
+                            Select This Worker
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm w-100 mt-2" onclick="addToWishlist(${p.id})">
+                            <i class="bi bi-heart"></i> Add to Wishlist
+                        </button>
+                    `;
+                });
+        }
+
+        function selectWorkerFromProfile(id, name) {
+            selectedWorkerId = id;
+            selectedWorkerName = name;
+            document.querySelectorAll('.worker-card').forEach(c => {
+                c.classList.toggle('selected', c.onclick && c.querySelector('button')?.getAttribute('onclick')?.includes(id));
+            });
+            // Re-highlight the correct card
+            fetchNearbyWorkers();
+        }
+
+        function revealWorkerPhone(workerId) {
+            fetch(`/api/location/worker-phone/${workerId}`)
+                .then(r => r.json())
+                .then(data => {
+                    const el = document.getElementById('profilePhone_' + workerId);
+                    if (data.phone) {
+                        el.innerHTML = '<i class="bi bi-telephone-fill text-success"></i> ' + data.phone;
+                    } else {
+                        el.innerHTML = '<span class="text-muted">Not available</span>';
+                    }
+                });
+        }
+
+        function addToWishlist(workerId) {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+            fetch(`/wishlist/add/${workerId}`, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken },
+                redirect: 'manual'
+            })
+            .then(r => {
+                alert('Worker added to your wishlist!');
+            })
+            .catch(() => alert('Could not add to wishlist.'));
+        }
+    </script>
+</body>
+</html>

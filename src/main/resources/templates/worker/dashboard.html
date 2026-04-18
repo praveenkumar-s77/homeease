@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard - HomeEase</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/worker/dashboard">🏠 HomeEase Worker</a>
+            <div class="ms-auto d-flex align-items-center">
+                <!-- Notification Bell -->
+                <a href="#notifications" class="btn btn-outline-light btn-sm me-2 position-relative">
+                    <i class="bi bi-bell"></i>
+                    <span th:if="${notificationCount > 0}"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          th:text="${notificationCount}">0</span>
+                </a>
+                <a href="/worker/profile" class="btn btn-outline-light btn-sm me-2">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="card bg-primary text-white text-center p-3">
+                    <h2 th:text="${totalCount}">0</h2><small>Total Jobs</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card bg-warning text-dark text-center p-3">
+                    <h2 th:text="${pendingCount}">0</h2><small>In Progress</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card bg-success text-white text-center p-3">
+                    <h2 th:text="${completedCount}">0</h2><small>Completed</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card bg-danger text-white text-center p-3">
+                    <h2 th:text="${cancelledCount}">0</h2><small>Cancelled</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Bookings (shown first if any) -->
+        <div th:if="${hasBookings}">
+            <h4>My Active Bookings</h4>
+            <div class="table-responsive mb-4">
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>#</th><th>Customer</th><th>Service</th><th>Date</th><th>Time</th><th>Address</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="b : ${myBookings}">
+                            <td th:text="${b.id}"></td>
+                            <td th:text="${b.user.fullName}"></td>
+                            <td th:text="${b.category.name}"></td>
+                            <td th:text="${b.bookingDate}"></td>
+                            <td th:text="${b.bookingTime}"></td>
+                            <td th:text="${b.address}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-primary' :
+                                                       (b.status.name() == 'COMPLETED' ? 'bg-success' : 'bg-danger')}"
+                                      th:text="${b.status}"></span>
+                            </td>
+                            <td>
+                                <form th:if="${b.status.name() == 'CONFIRMED'}" th:action="@{/worker/complete/{id}(id=${b.id})}" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-success">Complete</button>
+                                </form>
+                                <form th:if="${b.status.name() == 'CONFIRMED'}" th:action="@{/worker/cancel/{id}(id=${b.id})}" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-danger">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Services (shown if no bookings) -->
+        <div th:unless="${hasBookings}">
+            <h4>Available Services</h4>
+            <div class="row g-3 mb-4">
+                <div th:each="cat : ${categories}" class="col-md-4">
+                    <div class="card text-center p-3">
+                        <h5 th:text="${cat.name}">Service</h5>
+                        <p class="text-muted small" th:text="${cat.description}">Desc</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications: Pending Requests -->
+        <div id="notifications">
+            <h4><i class="bi bi-bell"></i> Service Requests
+                <span class="badge bg-danger" th:text="${notificationCount}">0</span>
+            </h4>
+            <div th:if="${#lists.isEmpty(pendingRequests)}" class="alert alert-info">
+                No pending service requests in your category right now.
+            </div>
+            <div th:unless="${#lists.isEmpty(pendingRequests)}">
+                <div th:each="b : ${pendingRequests}" class="card mb-2">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong th:text="${b.user.fullName}">Customer</strong>
+                            <div class="text-muted small">
+                                <span th:text="${b.category.name}">Service</span> ·
+                                <span th:text="${b.bookingDate}">Date</span> at
+                                <span th:text="${b.bookingTime}">Time</span>
+                            </div>
+                            <div class="small" th:text="${b.address}">Address</div>
+                            <div class="small text-muted" th:if="${b.description}" th:text="'Note: ' + ${b.description}"></div>
+                        </div>
+                        <div>
+                            <form th:action="@{/worker/accept/{id}(id=${b.id})}" method="post" class="d-inline">
+                                <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Accept</button>
+                            </form>
+                            <form th:action="@{/worker/reject/{id}(id=${b.id})}" method="post" class="d-inline">
+                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-lg"></i> Skip</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

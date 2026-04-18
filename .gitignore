@@ -1,0 +1,10 @@
+target/
+*.class
+*.jar
+*.log
+.idea/
+*.iml
+.DS_Store
+ngrok.exe
+cf.exe
+cloudflared.exe
