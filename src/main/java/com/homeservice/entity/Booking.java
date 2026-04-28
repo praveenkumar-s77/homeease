@@ -22,7 +22,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "worker_id")
-    private Worker worker;
+    private Expert expert;
 
     private String address;
     private LocalDate bookingDate;
@@ -54,8 +54,8 @@ public class Booking {
     public void setUser(User user) { this.user = user; }
     public ServiceCategory getCategory() { return category; }
     public void setCategory(ServiceCategory category) { this.category = category; }
-    public Worker getWorker() { return worker; }
-    public void setWorker(Worker worker) { this.worker = worker; }
+    public Expert getExpert() { return expert; }
+    public void setExpert(Expert expert) { this.expert = expert; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     public LocalDate getBookingDate() { return bookingDate; }

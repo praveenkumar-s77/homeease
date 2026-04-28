@@ -1,7 +1,7 @@
 package com.homeservice.service;
 
-import com.homeservice.entity.Worker;
-import com.homeservice.repository.WorkerRepository;
+import com.homeservice.entity.Expert;
+import com.homeservice.repository.ExpertRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -10,38 +10,38 @@ import java.util.List;
 @Service
 public class LocationService {
 
-    private final WorkerRepository workerRepository;
+    private final ExpertRepository expertRepository;
 
     @Value("${app.default.search.radius}")
     private double defaultRadius;
 
-    public LocationService(WorkerRepository workerRepository) {
-        this.workerRepository = workerRepository;
+    public LocationService(ExpertRepository expertRepository) {
+        this.expertRepository = expertRepository;
     }
 
-    public List<NearbyWorker> findNearbyWorkers(double lat, double lng, Long categoryId, Double radius) {
+    public List<NearbyExpert> findNearbyExperts(double lat, double lng, Long categoryId, Double radius) {
         double searchRadius = (radius != null) ? radius : defaultRadius;
-        List<Object[]> results = workerRepository.findNearbyAvailableWorkers(lat, lng, categoryId, searchRadius);
+        List<Object[]> results = expertRepository.findNearbyAvailableExperts(lat, lng, categoryId, searchRadius);
 
-        List<NearbyWorker> nearbyWorkers = new ArrayList<>();
+        List<NearbyExpert> nearbyExperts = new ArrayList<>();
         for (Object[] row : results) {
-            Worker worker = (Worker) row[0];
+            Expert expert = (Expert) row[0];
             double distance = (Double) row[1];
-            nearbyWorkers.add(new NearbyWorker(worker, Math.round(distance * 10.0) / 10.0));
+            nearbyExperts.add(new NearbyExpert(expert, Math.round(distance * 10.0) / 10.0));
         }
-        return nearbyWorkers;
+        return nearbyExperts;
     }
 
-    public static class NearbyWorker {
-        private final Worker worker;
+    public static class NearbyExpert {
+        private final Expert expert;
         private final double distanceKm;
 
-        public NearbyWorker(Worker worker, double distanceKm) {
-            this.worker = worker;
+        public NearbyExpert(Expert expert, double distanceKm) {
+            this.expert = expert;
             this.distanceKm = distanceKm;
         }
 
-        public Worker getWorker() { return worker; }
+        public Expert getExpert() { return expert; }
         public double getDistanceKm() { return distanceKm; }
     }
 }

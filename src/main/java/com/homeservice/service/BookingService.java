@@ -10,16 +10,16 @@ import java.util.List;
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final WorkerRepository workerRepository;
+    private final ExpertRepository expertRepository;
     private final ServiceCategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final WishlistRepository wishlistRepository;
 
-    public BookingService(BookingRepository bookingRepository, WorkerRepository workerRepository,
+    public BookingService(BookingRepository bookingRepository, ExpertRepository expertRepository,
                           ServiceCategoryRepository categoryRepository, UserRepository userRepository,
                           WishlistRepository wishlistRepository) {
         this.bookingRepository = bookingRepository;
-        this.workerRepository = workerRepository;
+        this.expertRepository = expertRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.wishlistRepository = wishlistRepository;
@@ -61,25 +61,25 @@ public class BookingService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    // Worker management (admin only)
-    public List<Worker> getAllWorkers() {
-        return workerRepository.findAll();
+    // Expert management (admin only)
+    public List<Expert> getAllExperts() {
+        return expertRepository.findAll();
     }
 
-    public List<Worker> getWorkersByCategory(ServiceCategory category) {
-        return workerRepository.findByCategory(category);
+    public List<Expert> getExpertsByCategory(ServiceCategory category) {
+        return expertRepository.findByCategory(category);
     }
 
-    public Worker saveWorker(Worker worker) {
-        return workerRepository.save(worker);
+    public Expert saveExpert(Expert expert) {
+        return expertRepository.save(expert);
     }
 
-    public Worker getWorkerById(Long id) {
-        return workerRepository.findById(id).orElse(null);
+    public Expert getExpertById(Long id) {
+        return expertRepository.findById(id).orElse(null);
     }
 
-    public void deleteWorker(Long id) {
-        workerRepository.deleteById(id);
+    public void deleteExpert(Long id) {
+        expertRepository.deleteById(id);
     }
 
     public ServiceCategory saveCategory(ServiceCategory category) {
@@ -90,13 +90,13 @@ public class BookingService {
         categoryRepository.deleteById(id);
     }
 
-    // Worker profile stats
-    public long getCompletedBookingsCount(Worker worker) {
-        return bookingRepository.countByWorkerAndStatus(worker, Booking.BookingStatus.COMPLETED);
+    // Expert profile stats
+    public long getCompletedBookingsCount(Expert expert) {
+        return bookingRepository.countByExpertAndStatus(expert, Booking.BookingStatus.COMPLETED);
     }
 
-    public long getTotalBookingsCount(Worker worker) {
-        return bookingRepository.countByWorker(worker);
+    public long getTotalBookingsCount(Expert expert) {
+        return bookingRepository.countByExpert(expert);
     }
 
     // Wishlist
@@ -104,19 +104,19 @@ public class BookingService {
         return wishlistRepository.findByUser(user);
     }
 
-    public boolean isWorkerWishlisted(User user, Worker worker) {
-        return wishlistRepository.existsByUserAndWorker(user, worker);
+    public boolean isExpertWishlisted(User user, Expert expert) {
+        return wishlistRepository.existsByUserAndExpert(user, expert);
     }
 
-    public void addToWishlist(User user, Worker worker) {
-        if (!wishlistRepository.existsByUserAndWorker(user, worker)) {
-            wishlistRepository.save(new Wishlist(user, worker));
+    public void addToWishlist(User user, Expert expert) {
+        if (!wishlistRepository.existsByUserAndExpert(user, expert)) {
+            wishlistRepository.save(new Wishlist(user, expert));
         }
     }
 
     @Transactional
-    public void removeFromWishlist(User user, Worker worker) {
-        wishlistRepository.deleteByUserAndWorker(user, worker);
+    public void removeFromWishlist(User user, Expert expert) {
+        wishlistRepository.deleteByUserAndExpert(user, expert);
     }
 
     public long getWishlistCount(User user) {
@@ -127,18 +127,18 @@ public class BookingService {
         return userRepository.save(user);
     }
 
-    // Worker by user account
-    public Worker getWorkerByUser(User user) {
-        return workerRepository.findByUser(user).orElse(null);
+    // Expert by user account
+    public Expert getExpertByUser(User user) {
+        return expertRepository.findByUser(user).orElse(null);
     }
 
-    public List<Booking> getBookingsByWorker(Worker worker) {
-        return bookingRepository.findByWorkerOrderByBookingDateDesc(worker);
+    public List<Booking> getBookingsByExpert(Expert expert) {
+        return bookingRepository.findByExpertOrderByBookingDateDesc(expert);
     }
 
-    // Pending requests for a worker's category (notifications)
+    // Pending requests for a Expert's category (notifications)
     public List<Booking> getPendingRequestsForCategory(ServiceCategory category) {
-        return bookingRepository.findByCategoryAndStatusAndWorkerIsNullOrderByBookingDateDesc(
+        return bookingRepository.findByCategoryAndStatusAndExpertIsNullOrderByBookingDateDesc(
                 category, Booking.BookingStatus.PENDING);
     }
 
@@ -148,5 +148,20 @@ public class BookingService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    // Expert skills
+    public List<Expert> getExpertsBySkill(Long categoryId) {
+        return expertRepository.findBySkillCategory(categoryId);
+    }
+
+    // Pending requests for all of an Expert's skills
+    public List<Booking> getPendingRequestsForSkills(java.util.Set<ServiceCategory> skills) {
+        java.util.List<Booking> allPending = new java.util.ArrayList<>();
+        for (ServiceCategory skill : skills) {
+            allPending.addAll(bookingRepository.findByCategoryAndStatusAndExpertIsNullOrderByBookingDateDesc(
+                    skill, Booking.BookingStatus.PENDING));
+        }
+        return allPending;
     }
 }

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#212529">
+    <title>About - HomeEase</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .hero-about { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 0; }
+        .service-icon-sm { width: 60px; height: 60px; border-radius: 50%; display: inline-flex;
+            align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        .icon-plumbing { background: linear-gradient(135deg, #0d6efd, #6610f2); }
+        .icon-electrical { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+        .icon-tiles { background: linear-gradient(135deg, #198754, #20c997); }
+        .icon-cleaning { background: linear-gradient(135deg, #0dcaf0, #0d6efd); }
+        .icon-painting { background: linear-gradient(135deg, #d63384, #e91e8a); }
+        .icon-carpentry { background: linear-gradient(135deg, #8B4513, #D2691E); }
+        .section-title { position: relative; padding-bottom: 10px; margin-bottom: 30px; }
+        .section-title::after { content: ''; position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); width: 60px; height: 3px; background: #667eea; }
+        .faq-item { border-left: 3px solid #667eea; }
+        .contact-icon { font-size: 2rem; color: #667eea; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">🏠 HomeEase</a>
+            <div class="ms-auto">
+                <a href="/login" class="btn btn-outline-light btn-sm me-2">Login</a>
+                <a href="/register" class="btn btn-light btn-sm">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero-about text-center">
+        <div class="container">
+            <h1 class="fw-bold">About HomeEase</h1>
+            <p class="lead mt-2">Making home maintenance effortless.</p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+
+        <!-- About Company -->
+        <section class="mb-5">
+            <h2 class="text-center section-title">Who We Are</h2>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="lead">HomeEase is a trusted home services platform that connects you with skilled and verified professionals for all your home maintenance needs.</p>
+                    <p>Finding reliable plumbers, electricians, painters, or carpenters in your city can be stressful. HomeEase solves this by bringing verified experts right to your doorstep. Every expert on our platform goes through ID verification and is rated by real customers.</p>
+                    <p>Whether it's a leaking pipe at midnight or a full home renovation, HomeEase has you covered with professionals who care about quality and your satisfaction.</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="card bg-light p-4">
+                        <div class="row g-3">
+                            <div class="col-4 text-center">
+                                <h2 class="text-primary fw-bold">500+</h2>
+                                <small class="text-muted">Verified Experts</small>
+                            </div>
+                            <div class="col-4 text-center">
+                                <h2 class="text-success fw-bold">10K+</h2>
+                                <small class="text-muted">Bookings Done</small>
+                            </div>
+                            <div class="col-4 text-center">
+                                <h2 class="text-warning fw-bold">4.8</h2>
+                                <small class="text-muted">Avg Rating</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Services -->
+        <section class="mb-5">
+            <h2 class="text-center section-title">Our Services</h2>
+            <div class="row g-4">
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-plumbing mx-auto mb-2"><i class="bi bi-droplet-fill"></i></div>
+                        <h6>Plumbing</h6>
+                        <p class="text-muted small">Pipe repairs, leak fixing, tap installation, bathroom fittings, and all water-related issues handled by certified plumbers.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-electrical mx-auto mb-2"><i class="bi bi-lightning-fill"></i></div>
+                        <h6>Electrical</h6>
+                        <p class="text-muted small">Wiring, switch repairs, fan installation, appliance repair, and electrical safety inspections by licensed electricians.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-tiles mx-auto mb-2"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                        <h6>Tiles &amp; Flooring</h6>
+                        <p class="text-muted small">Tile installation, floor polishing, marble work, and flooring repairs for kitchens, bathrooms, and living spaces.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-cleaning mx-auto mb-2"><i class="bi bi-water"></i></div>
+                        <h6>Syntex &amp; Tank Cleaning</h6>
+                        <p class="text-muted small">Water tank cleaning, syntex cleaning, overhead tank sanitization to ensure clean and safe drinking water.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-painting mx-auto mb-2"><i class="bi bi-palette-fill"></i></div>
+                        <h6>Painting</h6>
+                        <p class="text-muted small">Interior and exterior painting, texture work, waterproofing, and wall treatments by experienced painters.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="card h-100 text-center p-3">
+                        <div class="service-icon-sm icon-carpentry mx-auto mb-2"><i class="bi bi-hammer"></i></div>
+                        <h6>Carpentry</h6>
+                        <p class="text-muted small">Furniture repair, custom woodwork, door/window fixing, modular kitchen installation, and wardrobe assembly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="mb-5">
+            <h2 class="text-center section-title">How It Works</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-6">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:50px;height:50px;font-size:1.3rem;font-weight:bold;">1</div>
+                    <h6>Choose a Service</h6>
+                    <p class="text-muted small">Browse our services and pick what you need.</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:50px;height:50px;font-size:1.3rem;font-weight:bold;">2</div>
+                    <h6>Select an Expert</h6>
+                    <p class="text-muted small">View nearby verified experts with ratings.</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:50px;height:50px;font-size:1.3rem;font-weight:bold;">3</div>
+                    <h6>Book &amp; Pay</h6>
+                    <p class="text-muted small">Confirm your booking and pay online or cash.</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:50px;height:50px;font-size:1.3rem;font-weight:bold;">4</div>
+                    <h6>Get It Done</h6>
+                    <p class="text-muted small">Expert arrives at your doorstep on time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Address -->
+        <section class="mb-5">
+            <h2 class="text-center section-title">Our Office</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow p-4">
+                        <h5><i class="bi bi-building text-primary"></i> HomeEase Pvt. Ltd.</h5>
+                        <table class="table table-borderless table-sm mt-3">
+                            <tr>
+                                <td class="text-muted"><i class="bi bi-geo-alt-fill"></i> Address</td>
+                                <td>3rd Floor, Brigade Gateway,<br>26/1 Dr. Rajkumar Road, Malleshwaram,<br>Bangalore, Karnataka - 560055</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted"><i class="bi bi-clock"></i> Hours</td>
+                                <td>Mon - Sat: 9:00 AM - 7:00 PM<br>Sun: 10:00 AM - 4:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted"><i class="bi bi-globe"></i> Service Area</td>
+                                <td>All major areas in Bangalore including Kengeri, Malleshwaram, Koramangala, Whitefield, Electronic City, and more.</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow p-4 h-100">
+                        <h5><i class="bi bi-telephone-fill text-primary"></i> Contact Us</h5>
+                        <table class="table table-borderless table-sm mt-3">
+                            <tr>
+                                <td><i class="bi bi-telephone text-primary"></i></td>
+                                <td>+91 80-4567-8900</td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-whatsapp text-success"></i></td>
+                                <td>+91 98765-43210</td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-envelope text-danger"></i></td>
+                                <td>support@homeease.in</td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-instagram text-danger"></i></td>
+                                <td>@homeease.in</td>
+                            </tr>
+                        </table>
+                        <a href="/register" class="btn btn-primary mt-3"><i class="bi bi-person-plus"></i> Register Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs -->
+        <section class="mb-5">
+            <h2 class="text-center section-title">Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">How do I book a service?</button></h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Register or login to your account, choose a service category, select a date and time, pick a nearby expert, and confirm your booking. You can pay online or choose cash on service.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Are the experts verified?</button></h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Yes, every expert on HomeEase is required to submit government-issued ID (Aadhaar, PAN, or Driving Licence) which is verified by our admin team before they can accept bookings. Verified experts show a blue checkmark badge.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">What payment methods are accepted?</button></h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">We accept online payments via Razorpay (UPI, cards, net banking) and cash on service. You can also choose to pay later from your dashboard.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">Can I cancel a booking?</button></h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Yes, you can cancel a booking from your dashboard. If the booking is still pending (no expert assigned), it will be cancelled immediately. If an expert has already been assigned, the expert will be notified.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">How do I become an expert on HomeEase?</button></h2>
+                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Register as an expert, provide your government ID for verification, select the services you specialize in, and start accepting bookings from customers in your area. Our admin team will verify your profile within 24 hours.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">Is my phone number visible to experts?</button></h2>
+                    <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">Your phone number is hidden by default. It is only revealed when you explicitly click the "Show" button. Similarly, expert phone numbers are hidden until you choose to view them.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">Which areas do you serve?</button></h2>
+                    <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">We currently serve all major areas in Bangalore including Kengeri, Malleshwaram, Koramangala, Whitefield, Electronic City, Jayanagar, JP Nagar, HSR Layout, and more. We are expanding to other cities soon.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>🏠 HomeEase</h5>
+                    <p class="text-muted small">Making home maintenance effortless. Trusted by thousands of customers in Bangalore.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Quick Links</h6>
+                    <a href="/" class="text-muted d-block small">Home</a>
+                    <a href="/about" class="text-muted d-block small">About Us</a>
+                    <a href="/login" class="text-muted d-block small">Login</a>
+                    <a href="/register" class="text-muted d-block small">Register</a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Contact</h6>
+                    <p class="text-muted small mb-1"><i class="bi bi-geo-alt"></i> Bangalore, Karnataka</p>
+                    <p class="text-muted small mb-1"><i class="bi bi-telephone"></i> +91 80-4567-8900</p>
+                    <p class="text-muted small mb-1"><i class="bi bi-envelope"></i> support@homeease.in</p>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="text-center text-muted small mb-0">&copy; 2026 HomeEase Pvt. Ltd. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

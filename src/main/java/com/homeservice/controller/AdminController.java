@@ -19,22 +19,22 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         java.util.List<Booking> bookings = bookingService.getAllBookings();
-        java.util.List<Worker> workers = bookingService.getAllWorkers();
+        java.util.List<Expert> experts = bookingService.getAllExperts();
         java.util.List<User> users = bookingService.getAllUsers();
 
         long totalUsers = users.stream().filter(u -> u.getRole() == User.Role.USER).count();
-        long totalWorkers = users.stream().filter(u -> u.getRole() == User.Role.WORKER).count();
+        long totalExperts = users.stream().filter(u -> u.getRole() == User.Role.EXPERT).count();
         long pendingBookings = bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.PENDING).count();
         long confirmedBookings = bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.CONFIRMED).count();
         long completedBookings = bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.COMPLETED).count();
         long cancelledBookings = bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.CANCELLED).count();
 
         model.addAttribute("bookings", bookings);
-        model.addAttribute("workers", workers);
+        model.addAttribute("experts", experts);
         model.addAttribute("users", users);
         model.addAttribute("categories", bookingService.getAllCategories());
         model.addAttribute("totalUsers", totalUsers);
-        model.addAttribute("totalWorkers", totalWorkers);
+        model.addAttribute("totalExperts", totalExperts);
         model.addAttribute("totalBookings", bookings.size());
         model.addAttribute("pendingBookings", pendingBookings);
         model.addAttribute("confirmedBookings", confirmedBookings);
@@ -43,40 +43,40 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    // --- Worker Management (Admin Only) ---
+    // --- Expert Management (Admin Only) ---
 
     @GetMapping("/workers")
     public String listWorkers(Model model) {
-        model.addAttribute("workers", bookingService.getAllWorkers());
+        model.addAttribute("experts", bookingService.getAllExperts());
         model.addAttribute("categories", bookingService.getAllCategories());
         return "admin/workers";
     }
 
     @GetMapping("/workers/add")
     public String addWorkerForm(Model model) {
-        model.addAttribute("worker", new Worker());
+        model.addAttribute("expert", new Expert());
         model.addAttribute("categories", bookingService.getAllCategories());
-        return "admin/worker-form";
+        return "admin/expert-form";
     }
 
     @PostMapping("/workers/save")
-    public String saveWorker(@ModelAttribute Worker worker, @RequestParam Long categoryId) {
+    public String saveExpert(@ModelAttribute Expert expert, @RequestParam Long categoryId) {
         ServiceCategory category = bookingService.getCategoryById(categoryId);
-        worker.setCategory(category);
-        bookingService.saveWorker(worker);
+        expert.setCategory(category);
+        bookingService.saveExpert(expert);
         return "redirect:/admin/workers";
     }
 
     @GetMapping("/workers/edit/{id}")
     public String editWorker(@PathVariable Long id, Model model) {
-        model.addAttribute("worker", bookingService.getWorkerById(id));
+        model.addAttribute("expert", bookingService.getExpertById(id));
         model.addAttribute("categories", bookingService.getAllCategories());
-        return "admin/worker-form";
+        return "admin/expert-form";
     }
 
     @GetMapping("/workers/delete/{id}")
-    public String deleteWorker(@PathVariable Long id) {
-        bookingService.deleteWorker(id);
+    public String deleteExpert(@PathVariable Long id) {
+        bookingService.deleteExpert(id);
         return "redirect:/admin/workers";
     }
 
@@ -89,11 +89,11 @@ public class AdminController {
     }
 
     @PostMapping("/bookings/{id}/assign")
-    public String assignWorker(@PathVariable Long id, @RequestParam Long workerId) {
+    public String assignWorker(@PathVariable Long id, @RequestParam Long expertId) {
         Booking booking = bookingService.getBookingById(id);
-        Worker worker = bookingService.getWorkerById(workerId);
-        if (booking != null && worker != null) {
-            booking.setWorker(worker);
+        Expert expert = bookingService.getExpertById(expertId);
+        if (booking != null && expert != null) {
+            booking.setExpert(expert);
             booking.setStatus(Booking.BookingStatus.CONFIRMED);
             bookingService.createBooking(booking);
         }

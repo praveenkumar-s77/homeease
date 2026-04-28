@@ -63,24 +63,24 @@ public class ProfileController {
     }
 
     // Wishlist endpoints
-    @PostMapping("/wishlist/add/{workerId}")
-    public String addToWishlist(@PathVariable Long workerId, Authentication auth,
+    @PostMapping("/wishlist/add/{expertId}")
+    public String addToWishlist(@PathVariable Long expertId, Authentication auth,
                                 @RequestHeader(value = "Referer", required = false) String referer) {
         User user = bookingService.getUserByUsername(auth.getName());
-        Worker worker = bookingService.getWorkerById(workerId);
-        if (worker != null) {
-            bookingService.addToWishlist(user, worker);
+        Expert expert = bookingService.getExpertById(expertId);
+        if (expert != null) {
+            bookingService.addToWishlist(user, expert);
         }
         return "redirect:" + (referer != null ? referer : "/profile");
     }
 
-    @PostMapping("/wishlist/remove/{workerId}")
-    public String removeFromWishlist(@PathVariable Long workerId, Authentication auth,
+    @PostMapping("/wishlist/remove/{expertId}")
+    public String removeFromWishlist(@PathVariable Long expertId, Authentication auth,
                                      @RequestHeader(value = "Referer", required = false) String referer) {
         User user = bookingService.getUserByUsername(auth.getName());
-        Worker worker = bookingService.getWorkerById(workerId);
-        if (worker != null) {
-            bookingService.removeFromWishlist(user, worker);
+        Expert expert = bookingService.getExpertById(expertId);
+        if (expert != null) {
+            bookingService.removeFromWishlist(user, expert);
         }
         return "redirect:" + (referer != null ? referer : "/profile");
     }

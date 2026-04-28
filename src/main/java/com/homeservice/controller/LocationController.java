@@ -1,9 +1,9 @@
 package com.homeservice.controller;
 
-import com.homeservice.entity.Worker;
+import com.homeservice.entity.Expert;
 import com.homeservice.service.BookingService;
 import com.homeservice.service.LocationService;
-import com.homeservice.service.LocationService.NearbyWorker;
+import com.homeservice.service.LocationService.NearbyExpert;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -21,17 +21,17 @@ public class LocationController {
     }
 
     @GetMapping("/nearby-workers")
-    public ResponseEntity<List<Map<String, Object>>> getNearbyWorkers(
+    public ResponseEntity<List<Map<String, Object>>> getNearbyExperts(
             @RequestParam double lat,
             @RequestParam double lng,
             @RequestParam Long categoryId,
             @RequestParam(required = false) Double radius) {
 
-        List<NearbyWorker> nearby = locationService.findNearbyWorkers(lat, lng, categoryId, radius);
+        List<NearbyExpert> nearby = locationService.findNearbyExperts(lat, lng, categoryId, radius);
 
         List<Map<String, Object>> result = new ArrayList<>();
-        for (NearbyWorker nw : nearby) {
-            Worker w = nw.getWorker();
+        for (NearbyExpert nw : nearby) {
+            Expert w = nw.getExpert();
             Map<String, Object> map = new HashMap<>();
             map.put("id", w.getId());
             map.put("name", w.getName());
@@ -46,9 +46,9 @@ public class LocationController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/worker-profile/{id}")
+    @GetMapping("/Expert-profile/{id}")
     public ResponseEntity<Map<String, Object>> getWorkerProfile(@PathVariable Long id) {
-        Worker w = bookingService.getWorkerById(id);
+        Expert w = bookingService.getExpertById(id);
         if (w == null) {
             return ResponseEntity.notFound().build();
         }
@@ -68,9 +68,9 @@ public class LocationController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/worker-phone/{id}")
+    @GetMapping("/Expert-phone/{id}")
     public ResponseEntity<Map<String, String>> getWorkerPhone(@PathVariable Long id) {
-        Worker w = bookingService.getWorkerById(id);
+        Expert w = bookingService.getExpertById(id);
         if (w == null) {
             return ResponseEntity.notFound().build();
         }

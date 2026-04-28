@@ -17,23 +17,23 @@ public class Wishlist {
 
     @ManyToOne
     @JoinColumn(name = "worker_id")
-    private Worker worker;
+    private Expert expert;
 
     private LocalDateTime addedAt = LocalDateTime.now();
 
     public Wishlist() {}
 
-    public Wishlist(User user, Worker worker) {
+    public Wishlist(User user, Expert expert) {
         this.user = user;
-        this.worker = worker;
+        this.expert = expert;
     }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
-    public Worker getWorker() { return worker; }
-    public void setWorker(Worker worker) { this.worker = worker; }
+    public Expert getExpert() { return expert; }
+    public void setExpert(Expert expert) { this.expert = expert; }
     public LocalDateTime getAddedAt() { return addedAt; }
     public void setAddedAt(LocalDateTime addedAt) { this.addedAt = addedAt; }
 }

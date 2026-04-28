@@ -2,9 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#212529">
     <title>Dashboard - HomeEase</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         .service-card { transition: transform 0.2s; cursor: pointer; }
@@ -16,6 +20,15 @@
             display: inline-flex; align-items: center; justify-content: center;
             color: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
         .dropdown-menu { min-width: 180px; }
+        .service-icon { width: 70px; height: 70px; border-radius: 50%; display: inline-flex;
+            align-items: center; justify-content: center; font-size: 1.8rem; color: white; margin-bottom: 10px; }
+        .icon-plumbing { background: linear-gradient(135deg, #0d6efd, #6610f2); }
+        .icon-electrical { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+        .icon-tiles { background: linear-gradient(135deg, #198754, #20c997); }
+        .icon-cleaning { background: linear-gradient(135deg, #0dcaf0, #0d6efd); }
+        .icon-painting { background: linear-gradient(135deg, #d63384, #e91e8a); }
+        .icon-carpentry { background: linear-gradient(135deg, #8B4513, #D2691E); }
+        .icon-default { background: linear-gradient(135deg, #6c757d, #495057); }
     </style>
 </head>
 <body>
@@ -80,7 +93,7 @@
                     <thead>
                         <tr>
                             <th>#</th><th>Service</th><th>Date</th><th>Time</th>
-                            <th>Address</th><th>Worker</th><th>Status</th><th>Payment</th><th>Amount</th>
+                            <th>Address</th><th>Expert</th><th>Status</th><th>Payment</th><th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,8 +104,8 @@
                             <td th:text="${b.bookingTime}"></td>
                             <td th:text="${b.address}"></td>
                             <td>
-                                <span th:if="${b.worker != null}" th:text="${b.worker.name}"></span>
-                                <span th:if="${b.worker == null}" class="text-muted small">Not assigned</span>
+                                <span th:if="${b.expert != null}" th:text="${b.expert.name}"></span>
+                                <span th:if="${b.expert == null}" class="text-muted small">Not assigned</span>
                             </td>
                             <td>
                                 <span class="badge"
@@ -121,6 +134,15 @@
             <div th:each="cat : ${categories}" class="col-md-4">
                 <div class="card service-card h-100 text-center p-3">
                     <div class="card-body">
+                        <div th:switch="${cat.name}">
+                            <div th:case="'Plumbing'" class="service-icon icon-plumbing mx-auto"><i class="bi bi-droplet-fill"></i></div>
+                            <div th:case="'Electrical'" class="service-icon icon-electrical mx-auto"><i class="bi bi-lightning-fill"></i></div>
+                            <div th:case="'Tiles &amp; Flooring'" class="service-icon icon-tiles mx-auto"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                            <div th:case="'Syntex &amp; Tank Cleaning'" class="service-icon icon-cleaning mx-auto"><i class="bi bi-water"></i></div>
+                            <div th:case="'Painting'" class="service-icon icon-painting mx-auto"><i class="bi bi-palette-fill"></i></div>
+                            <div th:case="'Carpentry'" class="service-icon icon-carpentry mx-auto"><i class="bi bi-hammer"></i></div>
+                            <div th:case="*" class="service-icon icon-default mx-auto"><i class="bi bi-tools"></i></div>
+                        </div>
                         <h5 th:text="${cat.name}">Service</h5>
                         <p class="text-muted small" th:text="${cat.description}">Desc</p>
                         <a th:href="@{/book/{id}(id=${cat.id})}" class="btn btn-primary btn-sm">Book Now</a>

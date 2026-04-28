@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "workers")
-public class Worker {
+public class Expert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +37,17 @@ public class Worker {
     @JoinColumn(name = "category_id")
     private ServiceCategory category;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "worker_skills",
+            joinColumns = @JoinColumn(name = "worker_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private java.util.Set<ServiceCategory> skills = new java.util.HashSet<>();
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Worker() {}
+    public Expert() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -73,4 +79,6 @@ public class Worker {
     public void setVerified(boolean verified) { this.verified = verified; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    public java.util.Set<ServiceCategory> getSkills() { return skills; }
+    public void setSkills(java.util.Set<ServiceCategory> skills) { this.skills = skills; }
 }

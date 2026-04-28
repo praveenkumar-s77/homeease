@@ -32,7 +32,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    public enum Role { ADMIN, USER, WORKER }
+    public enum Role { ADMIN, USER, EXPERT }
 
     public User() {}
 

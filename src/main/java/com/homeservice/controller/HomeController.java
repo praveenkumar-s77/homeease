@@ -1,7 +1,6 @@
 package com.homeservice.controller;
 
 import com.homeservice.entity.*;
-import com.homeservice.entity.Worker;
 import com.homeservice.service.BookingService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,14 +24,19 @@ public class HomeController {
         return "home";
     }
 
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth, Model model) {
         User user = bookingService.getUserByUsername(auth.getName());
         if (user.getRole() == User.Role.ADMIN) {
             return "redirect:/admin/dashboard";
         }
-        if (user.getRole() == User.Role.WORKER) {
-            return "redirect:/worker/dashboard";
+        if (user.getRole() == User.Role.EXPERT) {
+            return "redirect:/expert/dashboard";
         }
 
         java.util.List<Booking> bookings = bookingService.getBookingsByUser(user);
@@ -68,7 +72,7 @@ public class HomeController {
                                 @RequestParam(required = false) String description,
                                 @RequestParam(required = false, defaultValue = "0") double latitude,
                                 @RequestParam(required = false, defaultValue = "0") double longitude,
-                                @RequestParam(required = false) Long selectedWorkerId,
+                                @RequestParam(required = false) Long selectedExpertId,
                                 Authentication auth) {
         User user = bookingService.getUserByUsername(auth.getName());
         ServiceCategory category = bookingService.getCategoryById(categoryId);
@@ -84,18 +88,15 @@ public class HomeController {
         booking.setLongitude(longitude);
         booking.setStatus(Booking.BookingStatus.PENDING);
 
-        // Assign selected worker if user chose one
-        if (selectedWorkerId != null) {
-            Worker worker = bookingService.getWorkerById(selectedWorkerId);
-            if (worker != null) {
-                booking.setWorker(worker);
+        if (selectedExpertId != null) {
+            Expert expert = bookingService.getExpertById(selectedExpertId);
+            if (expert != null) {
+                booking.setExpert(expert);
                 booking.setStatus(Booking.BookingStatus.CONFIRMED);
             }
         }
 
-        // Set a default amount based on category (admin can adjust later)
         booking.setAmount(500.0);
-
         Booking saved = bookingService.createBooking(booking);
         return "redirect:/payment/" + saved.getId();
     }
@@ -104,11 +105,9 @@ public class HomeController {
     public String paymentPage(@PathVariable Long bookingId, Model model, Authentication auth) {
         Booking booking = bookingService.getBookingById(bookingId);
         User user = bookingService.getUserByUsername(auth.getName());
-
         if (booking == null || !booking.getUser().getId().equals(user.getId())) {
             return "redirect:/dashboard";
         }
-
         model.addAttribute("booking", booking);
         return "user/payment";
     }
@@ -117,9 +116,8 @@ public class HomeController {
     public String payCash(@PathVariable Long bookingId, Authentication auth) {
         Booking booking = bookingService.getBookingById(bookingId);
         User user = bookingService.getUserByUsername(auth.getName());
-
         if (booking != null && booking.getUser().getId().equals(user.getId())) {
-            booking.setPaymentStatus(Booking.PaymentStatus.UNPAID); // will pay on service
+            booking.setPaymentStatus(Booking.PaymentStatus.UNPAID);
             booking.setPaymentId("CASH_ON_SERVICE");
             bookingService.createBooking(booking);
         }

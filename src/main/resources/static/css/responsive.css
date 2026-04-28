@@ -1,0 +1,165 @@
+/* HomeEase Responsive CSS - Android 10+, iOS 12+, Tablets */
+
+/* Base mobile-first fixes */
+* { -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+
+/* Safe area for notched phones (iPhone X+) */
+body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* Prevent horizontal overflow */
+.container, .container-fluid { max-width: 100vw; overflow-x: hidden; }
+
+/* Tables scroll horizontally on mobile */
+.table-responsive { -webkit-overflow-scrolling: touch; }
+
+/* Minimum touch target size (48px for accessibility) */
+.btn, .form-control, .form-select, .form-check-input,
+.dropdown-item, .nav-link, a.btn {
+    min-height: 44px;
+}
+.btn-sm { min-height: 38px; padding: 6px 12px; }
+
+/* Form inputs - prevent zoom on iOS */
+input, select, textarea {
+    font-size: 16px !important;
+}
+
+/* Navbar fixes */
+.navbar { padding: 8px 0; }
+.navbar-brand { font-size: 1.1rem; white-space: nowrap; }
+
+/* Profile dropdown */
+.profile-pic {
+    min-width: 36px; min-height: 36px;
+    flex-shrink: 0;
+}
+.dropdown-menu { z-index: 1050; }
+
+/* Cards - no overlap */
+.card { overflow: hidden; word-wrap: break-word; }
+.card-body { overflow: hidden; }
+
+/* Stat cards */
+.stat-card h2, .stat-card h3 { font-size: 1.5rem; }
+.stat-card small { font-size: 0.75rem; }
+
+/* Service icons */
+.service-icon { flex-shrink: 0; }
+
+/* Badge wrapping */
+.badge { white-space: normal; word-break: break-word; }
+
+/* ===== MOBILE (up to 576px) ===== */
+@media (max-width: 576px) {
+    .container { padding-left: 12px; padding-right: 12px; }
+
+    /* Navbar compact */
+    .navbar-brand { font-size: 1rem; }
+    .navbar .btn-sm { padding: 4px 8px; font-size: 0.75rem; min-height: 34px; }
+
+    /* Stats grid - 2 columns */
+    .stat-card { padding: 10px; }
+    .stat-card h2, .stat-card h3 { font-size: 1.2rem; }
+
+    /* Service cards - 1 column on very small */
+    .service-card { margin-bottom: 8px; }
+    .service-icon { width: 55px; height: 55px; font-size: 1.4rem; }
+
+    /* Tables - force horizontal scroll */
+    .table { font-size: 0.8rem; }
+    .table th, .table td { padding: 6px 8px; white-space: nowrap; }
+
+    /* Profile avatar */
+    .profile-avatar { width: 70px; height: 70px; font-size: 1.8rem; }
+
+    /* Forms */
+    .form-label { font-size: 0.9rem; }
+
+    /* Booking cards */
+    .card-body .d-flex { flex-wrap: wrap; gap: 8px; }
+
+    /* Notification cards */
+    .card-body.d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .card-body.d-flex.justify-content-between > div:last-child {
+        margin-top: 8px;
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+
+    /* Hero section */
+    .hero { padding: 40px 0; }
+    .hero h1 { font-size: 1.6rem; }
+    .hero .lead { font-size: 1rem; }
+
+    /* Modal */
+    .modal-dialog { margin: 10px; }
+
+    /* Profile page */
+    .profile-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
+    .table-sm td { font-size: 0.85rem; padding: 4px 6px; }
+}
+
+/* ===== TABLET (577px - 991px) ===== */
+@media (min-width: 577px) and (max-width: 991px) {
+    .stat-card h2, .stat-card h3 { font-size: 1.3rem; }
+    .service-icon { width: 60px; height: 60px; font-size: 1.6rem; }
+    .hero h1 { font-size: 2rem; }
+
+    /* 2-column service grid on tablet */
+    .row.g-3 > .col-md-4 { flex: 0 0 50%; max-width: 50%; }
+}
+
+/* ===== LARGE SCREENS ===== */
+@media (min-width: 992px) {
+    .service-icon { width: 70px; height: 70px; font-size: 1.8rem; }
+}
+
+/* ===== iOS specific fixes ===== */
+@supports (-webkit-touch-callout: none) {
+    /* Fix iOS input zoom */
+    input[type="text"], input[type="email"], input[type="password"],
+    input[type="tel"], input[type="number"], input[type="date"],
+    input[type="time"], select, textarea {
+        font-size: 16px !important;
+    }
+    /* Fix iOS sticky hover */
+    .service-card:hover { transform: none; }
+    @media (hover: hover) {
+        .service-card:hover { transform: translateY(-3px); }
+    }
+    /* Fix iOS bottom bar overlap */
+    body { padding-bottom: max(env(safe-area-inset-bottom), 20px); }
+}
+
+/* ===== Fix for older Android WebView ===== */
+@supports not (padding: env(safe-area-inset-top)) {
+    body { padding-bottom: 15px; }
+}
+
+/* Prevent text overflow everywhere */
+h1, h2, h3, h4, h5, h6, p, td, th, span, a, label {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Fix flexbox wrapping for notification/booking action buttons */
+form.d-inline { display: inline-flex !important; }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Print-friendly */
+@media print {
+    .navbar, .btn, form { display: none !important; }
+}
